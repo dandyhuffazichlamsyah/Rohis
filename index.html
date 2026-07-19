@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pendaftaran & Dashboard Rohis SMAN 27</title>
+
+  <!-- Tailwind CSS via CDN (emerald & warm gold palette) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rohis: {
+              light: '#f4fbf7',
+              brand: '#059669',     /* Emerald 600 - Main Brand */
+              brandHover: '#047857',/* Emerald 700 */
+              accent: '#f59e0b',    /* Amber 500 - Warm Accent */
+              textMain: '#1e293b',  /* Slate 800 */
+              textMuted: '#64748b', /* Slate 500 */
+              bgCard: '#ffffff',
+            }
+          },
+          animation: {
+            'spin-slow': 'spin 16s linear infinite',
+            'bounce-slow': 'bounce 4s infinite',
+            'pulse-soft': 'pulseSoft 2.5s ease-in-out infinite',
+            'float-leaf': 'floatLeaf 8s ease-in-out infinite alternate',
+            'shake': 'shake 0.4s ease-in-out',
+          },
+          keyframes: {
+            pulseSoft: {
+              '0%, 100%': { transform: 'scale(1)', filter: 'drop-shadow(0 4px 12px rgba(5, 150, 105, 0.1))' },
+              '50%': { transform: 'scale(1.02)', filter: 'drop-shadow(0 6px 20px rgba(5, 150, 105, 0.15))' },
+            },
+            floatLeaf: {
+              '0%': { transform: 'translateY(0px) rotate(0deg)' },
+              '100%': { transform: 'translateY(-12px) rotate(5deg)' },
+            },
+            shake: {
+              '0%, 100%': { transform: 'translateX(0)' },
+              '20%, 60%': { transform: 'translateX(-4px)' },
+              '40%, 80%': { transform: 'translateX(4px)' },
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Font (Plus Jakarta Sans - very warm, premium, clean) -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(5, 150, 105, 0.2);
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(5, 150, 105, 0.4);
+    }
+  </style>
+</head>
+
+<body
+  class="bg-gradient-to-b from-[#f0f9f4] via-[#f7fcf9] to-[#ffffff] text-rohis-textMain min-h-screen relative overflow-x-hidden select-none">
+
+  <!-- ====================== LIGHT BACKGROUND DECORATIONS ====================== -->
+  <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+    <!-- Subtle leaves/floral graphic placeholder patterns (drawn in CSS for hand-crafted look) -->
+    <div class="absolute -top-12 -left-12 w-64 h-64 rounded-full bg-emerald-100/40 blur-3xl animate-float-leaf"></div>
+    <div class="absolute bottom-24 -right-16 w-80 h-80 rounded-full bg-emerald-100/30 blur-3xl animate-float-leaf"
+      style="animation-delay: -2s;"></div>
+  </div>
+
+  <!-- ====================== 1️⃣ INTRO / SPLASH SCREEN ====================== -->
+  <div id="splash-screen"
+    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#f8fdfb] transition-all duration-700">
+    <div class="relative flex flex-col items-center max-w-sm px-6 text-center">
+
+      <!-- Minimalist Hand-crafted Logo Ring -->
+      <div class="relative w-36 h-36 mb-6 flex items-center justify-center animate-pulse-soft">
+        <!-- Delicate rotating dotted ring -->
+        <div class="absolute inset-0 rounded-full border border-dashed border-emerald-500/30 animate-spin-slow"></div>
+        <div class="absolute inset-2.5 rounded-full border border-emerald-500/10"></div>
+
+        <!-- Logo Image Container -->
+        <div
+          class="w-28 h-28 rounded-full bg-white flex items-center justify-center p-2.5 shadow-[0_8px_30px_rgb(5,150,105,0.06)] border border-emerald-100 overflow-hidden">
+          <img id="splash-logo" src="logo.png" alt="Logo Rohis" class="w-full h-full object-contain"
+            onerror="this.style.display='none'; document.getElementById('splash-logo-fallback').classList.remove('hidden');">
+          <!-- Fallback -->
+          <div id="splash-logo-fallback" class="hidden text-emerald-600 flex flex-col items-center justify-center">
+            <i data-lucide="leaf" class="w-10 h-10 mb-1 text-emerald-500"></i>
+            <span class="text-[9px] font-extrabold tracking-widest uppercase text-emerald-700">ROHIS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Welcome Greetings -->
+      <span class="text-[10px] font-bold text-emerald-600 tracking-[0.3em] uppercase mb-1">Selamat Datang</span>
+      <h1 class="text-2xl font-extrabold tracking-tight text-slate-800 mb-1">
+        ROHIS SMAN 27
+      </h1>
+      <p class="text-xs text-rohis-textMuted max-w-[280px] mb-8">
+        Menebar kebaikan, menyambung ukhuwah, & menggapai ridho-Nya
+      </p>
+
+      <!-- Clean Loading Indicator -->
+      <div class="w-48 h-1 bg-emerald-100 rounded-full overflow-hidden mb-6 relative">
+        <div id="splash-progress"
+          class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300 ease-out"
+          style="width: 0%;"></div>
+      </div>
+
+      <button id="skip-btn"
+        class="px-6 py-2.5 rounded-full text-xs font-semibold tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_4px_14px_rgba(5,150,105,0.2)] flex items-center gap-1">
+        Mulai Sekarang <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ====================== MAIN CONTAINER ====================== -->
+  <main id="main-content"
+    class="min-h-screen flex flex-col opacity-0 scale-[0.98] transition-all duration-700 pointer-events-none">
+
+    <!-- TOP BAR / HEADER -->
+    <header class="container mx-auto max-w-4xl px-6 py-6 flex items-center justify-between">
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3.5">
+        <div
+          class="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center p-2 overflow-hidden shadow-sm">
+          <img id="hdr-logo" src="logo.png" alt="Logo" class="w-full h-full object-contain"
+            onerror="this.style.display='none'; document.getElementById('hdr-logo-fallback').classList.remove('hidden');">
+          <div id="hdr-logo-fallback" class="hidden text-emerald-600">
+            <i data-lucide="leaf" class="w-6 h-6"></i>
+          </div>
+        </div>
+        <div>
+          <h2 class="text-base font-black tracking-wider text-slate-800 uppercase leading-none">ROHIS 27</h2>
+          <p class="text-xs text-rohis-textMuted uppercase tracking-widest font-bold mt-1">SMAN 27 Jakarta</p>
+        </div>
+      </div>
+
+      <!-- Clean Segmented Navigation Tab Control -->
+      <div class="bg-slate-100/80 border border-slate-200/40 p-1 rounded-full flex relative select-none">
+        <!-- Background slider indicator -->
+        <div id="nav-slider"
+          class="absolute top-1 bottom-1 left-1 rounded-full bg-white shadow border border-slate-200/30 transition-all duration-300 ease-out"
+          style="width: 130px; transform: translateX(0px);"></div>
+
+        <button onclick="switchTab('form')" id="tab-form"
+          class="relative z-10 px-6 py-2 rounded-full text-xs font-extrabold tracking-wider text-emerald-700 transition-all duration-300 w-[130px] text-center">
+          Pendaftaran
+        </button>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard"
+          class="relative z-10 px-6 py-2 rounded-full text-xs font-extrabold tracking-wider text-rohis-textMuted hover:text-slate-800 transition-all duration-300 w-[130px] text-center">
+          Dashboard
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="flex-1 container mx-auto max-w-3xl px-4 py-6 flex flex-col justify-center items-center">
+
+      <!-- ====================== FORM PANEL ====================== -->
+      <section id="form-panel" class="w-full max-w-lg transition-all duration-500 transform translate-y-0 opacity-100">
+        <div
+          class="bg-white border border-slate-200/50 rounded-3xl p-7 sm:p-9 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden">
+
+          <div class="text-center mb-6">
+            <span
+              class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+              Formulir Calon Anggota
+            </span>
+            <h3 class="text-xl font-extrabold text-slate-800 mt-2.5">Mari Bertumbuh Bersama</h3>
+            <p class="text-xs text-rohis-textMuted mt-1">Daftarkan dirimu dan jadilah bagian dari perjalanan kebaikan
+              ini</p>
+          </div>
+
+          <form id="registrationForm" class="space-y-4">
+            <!-- Nama Lengkap -->
+            <div class="space-y-1">
+              <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider ml-1">Nama
+                Lengkap</label>
+              <div class="relative group">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-600 transition-colors">
+                  <i data-lucide="user" class="w-4 h-4"></i>
+                </div>
+                <input type="text" id="input-nama" required placeholder="Contoh: Muhammad Rafli"
+                  class="w-full bg-slate-50/50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300">
+              </div>
+            </div>
+
+            <!-- Kelas / Jurusan -->
+            <div class="space-y-1">
+              <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider ml-1">Kelas</label>
+              <div class="relative group">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-600 transition-colors">
+                  <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                </div>
+                <input type="text" id="input-kelas" required placeholder="Contoh: X-1"
+                  class="w-full bg-slate-50/50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300">
+              </div>
+            </div>
+
+            <!-- Nomor WhatsApp -->
+            <div class="space-y-1">
+              <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider ml-1">Nomor
+                WhatsApp</label>
+              <div class="relative group">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-600 transition-colors">
+                  <i data-lucide="phone" class="w-4 h-4"></i>
+                </div>
+                <input type="tel" id="input-wa" required placeholder="Contoh: 081234567890"
+                  class="w-full bg-slate-50/50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300">
+              </div>
+            </div>
+
+            <!-- Kaka Kelas Pengundang -->
+            <div class="space-y-1">
+              <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider ml-1">Invited by (Nama
+                Kaka Kelas)</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <i data-lucide="user-check" class="w-4 h-4"></i>
+                </div>
+                <input id="select-mentor" list="kaka-kelas-list" required placeholder="Memuat daftar Kaka Kelas..."
+                  class="w-full bg-slate-50/50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300">
+                <datalist id="kaka-kelas-list"></datalist>
+                <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                  <i data-lucide="search" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <p id="kaka-kelas-tip" class="text-[10px] text-emerald-600 font-semibold mt-1 hidden">
+                ℹ️ Nama tidak terdaftar? Tetap lanjutkan menulis nama teman/kaka kelas pengundang Anda.
+              </p>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="btn-submit"
+              class="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 transform active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-emerald-500/20 flex justify-center items-center gap-2.5 shadow-[0_4px_12px_rgba(5,150,105,0.15)]">
+              <span>Kirim Pendaftaran</span>
+              <i data-lucide="send-horizontal" class="w-4 h-4" id="submit-icon"></i>
+              <div id="submit-loader"
+                class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ====================== DASHBOARD PANEL ====================== -->
+      <section id="dashboard-panel"
+        class="w-full max-w-xl hidden opacity-0 transition-all duration-500 transform translate-y-4">
+
+        <!-- A. Authentication Screen -->
+        <div id="dashboard-auth"
+          class="bg-white border border-slate-200/50 rounded-3xl p-7 sm:p-9 shadow-[0_8px_30px_rgb(0,0,0,0.02)] max-w-sm mx-auto relative overflow-hidden transition-all duration-300">
+
+          <div class="text-center mb-6">
+            <div
+              class="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="lock" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-lg font-extrabold text-slate-800">Akses Internal</h3>
+            <p class="text-xs text-rohis-textMuted mt-1">Hanya dapat diakses oleh Panitia Pelaksana.</p>
+          </div>
+
+          <div class="space-y-3.5">
+            <div class="relative group">
+              <div
+                class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-600 transition-colors">
+                <i data-lucide="key-round" class="w-4 h-4"></i>
+              </div>
+              <input type="password" id="input-pin" placeholder="Masukkan PIN Panitia"
+                class="w-full bg-slate-50/50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300">
+              <button onclick="togglePinVisibility()"
+                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
+                <i data-lucide="eye" class="w-4 h-4" id="pin-eye-icon"></i>
+              </button>
+            </div>
+
+            <p id="pin-error-msg"
+              class="text-[11px] text-red-600 font-semibold hidden flex items-center gap-1.5 px-1 animate-shake">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> PIN yang dimasukkan salah!
+            </p>
+
+            <button onclick="verifyPin()"
+              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 transform active:scale-[0.99] shadow-[0_4px_12px_rgba(5,150,105,0.15)]">
+              Buka Dashboard
+            </button>
+          </div>
+        </div>
+
+        <!-- B. Dashboard Statistics Screen -->
+        <div id="dashboard-content" class="hidden space-y-5">
+
+          <!-- Stats Summary Cards -->
+          <div class="grid grid-cols-3 gap-3">
+            <div
+              class="bg-white border border-slate-200/50 rounded-2xl p-4 flex flex-col justify-center shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
+              <span class="text-[9px] text-rohis-textMuted font-bold uppercase tracking-wider">Pendaftar</span>
+              <h4 id="stat-total-pendaftar" class="text-xl font-extrabold text-slate-800 mt-1">0</h4>
+            </div>
+
+            <div
+              class="bg-white border border-slate-200/50 rounded-2xl p-4 flex flex-col justify-center shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
+              <span class="text-[9px] text-rohis-textMuted font-bold uppercase tracking-wider">Kaka Kelas</span>
+              <h4 id="stat-total-mentor" class="text-xl font-extrabold text-slate-800 mt-1">0</h4>
+            </div>
+
+            <div
+              class="bg-white border border-slate-200/50 rounded-2xl p-4 flex flex-col justify-center shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
+              <span class="text-[9px] text-rohis-textMuted font-bold uppercase tracking-wider">Top Kaka Kelas</span>
+              <h4 id="stat-top-mentor" class="text-[11px] font-extrabold text-emerald-700 mt-1.5 truncate">-</h4>
+            </div>
+          </div>
+
+          <!-- Leaderboard Card -->
+          <div
+            class="bg-white border border-slate-200/50 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden">
+
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="text-sm font-extrabold text-slate-800">Rekapitulasi Kaka Kelas</h3>
+                <p class="text-[11px] text-rohis-textMuted mt-0.5">Urutan perolehan ajakan calon anggota teratas</p>
+              </div>
+              <button onclick="refreshDashboardData()"
+                class="p-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 transition-all duration-300">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="btn-refresh-icon"></i>
+              </button>
+            </div>
+
+            <!-- Leaderboard Cards View -->
+            <div id="leaderboard-container" class="space-y-3 max-h-[300px] overflow-y-auto pr-0.5 custom-scrollbar">
+              <div class="text-center py-8 text-rohis-textMuted text-xs">
+                <i data-lucide="loader" class="w-5 h-5 animate-spin mx-auto mb-2 text-emerald-600"></i>
+                Menghubungkan ke database...
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="py-5 text-center text-[10px] text-rohis-textMuted border-t border-slate-100">
+      <p>&copy; 2026 Seksi Rohani Islam (ROHIS) SMAN 27 Jakarta. All Rights Reserved.</p>
+    </footer>
+  </main>
+
+  <!-- ====================== SUCCESS POPUP / CONFIRMATION MODAL ====================== -->
+  <div id="success-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div
+      class="bg-white border border-slate-200 rounded-3xl p-7 max-w-sm w-full mx-4 shadow-2xl relative text-center transform scale-90 transition-transform duration-300">
+
+      <!-- Check Icon Graphic -->
+      <div
+        class="w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="check" class="w-8 h-8 text-emerald-600"></i>
+      </div>
+
+      <h3 class="text-lg font-extrabold text-slate-800 mb-1.5">Pendaftaran Sukses!</h3>
+      <p class="text-xs text-rohis-textMuted mb-2">Selamat! Data pendaftaran Anda berhasil disimpan di Google Sheets.
+      </p>
+      <p class="text-xs text-emerald-600 font-bold mb-5">Gabung grup WhatsApp Rohis. Otomatis dialihkan dalam <span
+          id="countdown-timer" class="font-extrabold">3</span> detik...</p>
+
+      <!-- Details Summary Card -->
+      <div class="bg-slate-50 border border-slate-150 rounded-2xl p-4 mb-5 text-left space-y-2 text-xs">
+        <div class="flex justify-between border-b border-slate-100 pb-2">
+          <span class="text-rohis-textMuted">Nama Lengkap</span>
+          <span class="text-slate-800 font-bold" id="success-nama">-</span>
+        </div>
+        <div class="flex justify-between border-b border-slate-100 pb-2">
+          <span class="text-rohis-textMuted">Kelas / Jurusan</span>
+          <span class="text-slate-800 font-bold" id="success-kelas">-</span>
+        </div>
+        <div class="flex justify-between border-b border-slate-100 pb-2">
+          <span class="text-rohis-textMuted">Nomor WA</span>
+          <span class="text-slate-800 font-bold" id="success-wa">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-rohis-textMuted">Kaka Kelas</span>
+          <span class="text-emerald-700 font-bold" id="success-mentor">-</span>
+        </div>
+      </div>
+
+      <a id="btn-join-wa" href="#" target="_blank"
+        class="w-full block text-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 shadow-md">
+        Gabung Grup WA Sekarang
+      </a>
+      <button onclick="closeSuccessModal()"
+        class="mt-3 text-[11px] text-rohis-textMuted hover:text-slate-800 transition-colors">
+        Kembali ke Formulir
+      </button>
+    </div>
+  </div>
+
+  <!-- ====================== JAVASCRIPT ====================== -->
+  <script>
+    // -------------------------------------------------------------------------
+    // CONFIGURATION – replace with your deployed Apps Script URL
+    // -------------------------------------------------------------------------
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbycMbPQNfugPaPJbHnlH__nzKoLPpknrlozNiGZ_WYvuosNu_sGmzuSKARC34bwGbc/exec';
+
+    // LINK GRUP WHATSAPP - Silakan ganti link grup WA Anda di sini
+    const WA_GROUP_URL = 'https://chat.whatsapp.com/LJsJanUTOhrJnJOiKTVo4Q?s=sw&p=a&ilr=1';
+
+    let cachedSummaryData = [];
+    let redirectInterval = null;
+
+    // Helper to safely load Lucide Icons without crashing
+    function safeCreateIcons() {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        try {
+          lucide.createIcons();
+        } catch (e) {
+          console.warn('Lucide icon creation failed:', e);
+        }
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // A. SPLASH SCREEN & INITIALIZATION
+    // -------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      safeCreateIcons();
+
+      // Splash progress animation simulation
+      const progress = document.getElementById('splash-progress');
+      let currentProgress = 0;
+
+      const interval = setInterval(() => {
+        currentProgress += Math.floor(Math.random() * 18) + 4;
+        if (currentProgress >= 100) {
+          currentProgress = 100;
+          clearInterval(interval);
+          setTimeout(enterMainApp, 450);
+        }
+        progress.style.width = currentProgress + '%';
+      }, 130);
+
+      loadMentorDropdown();
+
+      // Autocomplete search helper tip listener
+      const inputMentor = document.getElementById('select-mentor');
+      const tipMentor = document.getElementById('kaka-kelas-tip');
+      if (inputMentor && tipMentor) {
+        inputMentor.addEventListener('input', () => {
+          const value = inputMentor.value.trim();
+          if (value === '') {
+            tipMentor.classList.add('hidden');
+            return;
+          }
+          const options = Array.from(document.getElementById('kaka-kelas-list').options).map(opt => opt.value);
+          const isFound = options.includes(value);
+          if (!isFound) {
+            tipMentor.classList.remove('hidden');
+          } else {
+            tipMentor.classList.add('hidden');
+          }
+        });
+      }
+    });
+
+    document.getElementById('skip-btn').addEventListener('click', enterMainApp);
+
+    function enterMainApp() {
+      const splash = document.getElementById('splash-screen');
+      const main = document.getElementById('main-content');
+
+      splash.classList.add('opacity-0', 'pointer-events-none');
+      main.classList.remove('opacity-0', 'scale-[0.98]', 'pointer-events-none');
+      main.classList.add('opacity-100', 'scale-100');
+
+      setTimeout(() => {
+        splash.style.display = 'none';
+      }, 700);
+    }
+
+    // -------------------------------------------------------------------------
+    // B. NAVIGATION / SWITCH TAB
+    // -------------------------------------------------------------------------
+    let currentTab = 'form';
+
+    function switchTab(tab) {
+      if (tab === currentTab) return;
+      currentTab = tab;
+
+      const navSlider = document.getElementById('nav-slider');
+      const tabFormBtn = document.getElementById('tab-form');
+      const tabDashboardBtn = document.getElementById('tab-dashboard');
+
+      const formPanel = document.getElementById('form-panel');
+      const dashboardPanel = document.getElementById('dashboard-panel');
+
+      if (tab === 'form') {
+        navSlider.style.transform = 'translateX(0px)';
+        tabFormBtn.classList.remove('text-rohis-textMuted');
+        tabFormBtn.classList.add('text-emerald-700');
+        tabDashboardBtn.classList.remove('text-emerald-700');
+        tabDashboardBtn.classList.add('text-rohis-textMuted');
+
+        dashboardPanel.classList.add('opacity-0', 'translate-y-4');
+        setTimeout(() => {
+          dashboardPanel.classList.add('hidden');
+          formPanel.classList.remove('hidden');
+          setTimeout(() => {
+            formPanel.classList.remove('opacity-0', 'translate-y-4');
+            formPanel.classList.add('opacity-100', 'translate-y-0');
+          }, 50);
+        }, 300);
+      } else {
+        navSlider.style.transform = 'translateX(130px)';
+        tabDashboardBtn.classList.remove('text-rohis-textMuted');
+        tabDashboardBtn.classList.add('text-emerald-700');
+        tabFormBtn.classList.remove('text-emerald-700');
+        tabFormBtn.classList.add('text-rohis-textMuted');
+
+        formPanel.classList.add('opacity-0', 'translate-y-4');
+        setTimeout(() => {
+          formPanel.classList.add('hidden');
+          dashboardPanel.classList.remove('hidden');
+          setTimeout(() => {
+            dashboardPanel.classList.remove('opacity-0', 'translate-y-4');
+            dashboardPanel.classList.add('opacity-100', 'translate-y-0');
+          }, 50);
+        }, 300);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // C. DATABASE API FETCHING
+    // -------------------------------------------------------------------------
+    async function loadMentorDropdown() {
+      const datalist = document.getElementById('kaka-kelas-list');
+      const input = document.getElementById('select-mentor');
+      try {
+        const response = await fetch(`${GAS_URL}?action=kaka_kelas`);
+        if (!response.ok) throw new Error('Failed to load Kaka Kelas');
+        const data = await response.json();
+
+        datalist.innerHTML = '';
+        if (data.kaka_kelas && data.kaka_kelas.length > 0) {
+          data.kaka_kelas.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            datalist.appendChild(opt);
+          });
+          input.placeholder = "Ketik atau pilih Kaka Kelas...";
+        } else {
+          input.placeholder = "Daftar Kaka Kelas kosong";
+        }
+      } catch (error) {
+        console.error(error);
+        input.placeholder = "Gagal memuat Kaka Kelas. Segarkan halaman.";
+      }
+    }
+
+    // D. FORM REGISTRATION SUBMISSION
+    document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById('btn-submit');
+      const submitIcon = document.getElementById('submit-icon');
+      const submitLoader = document.getElementById('submit-loader');
+
+      submitBtn.disabled = true;
+      submitIcon.classList.add('hidden');
+      submitLoader.classList.remove('hidden');
+
+      const nama = document.getElementById('input-nama').value.trim();
+      const kelas = document.getElementById('input-kelas').value.trim();
+      const wa = document.getElementById('input-wa').value.trim();
+      const kaka_kelas = document.getElementById('select-mentor').value.trim();
+
+      if (!nama || !kelas || !wa || !kaka_kelas) {
+        alert('Mohon isi semua kolom formulir pendaftaran!');
+        submitBtn.disabled = false;
+        submitIcon.classList.remove('hidden');
+        submitLoader.classList.add('hidden');
+        return;
+      }
+
+      const payload = { nama, kelas, wa, kaka_kelas };
+
+      try {
+        await fetch(GAS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        document.getElementById('success-nama').textContent = nama;
+        document.getElementById('success-kelas').textContent = kelas;
+        document.getElementById('success-wa').textContent = wa;
+        document.getElementById('success-mentor').textContent = kaka_kelas;
+
+        document.getElementById('registrationForm').reset();
+
+        // Configure WA Button link
+        const waBtn = document.getElementById('btn-join-wa');
+        if (waBtn) {
+          waBtn.href = WA_GROUP_URL;
+          waBtn.onclick = (event) => {
+            if (redirectInterval) clearInterval(redirectInterval);
+            closeSuccessModal();
+          };
+        }
+
+        openSuccessModal();
+
+        // Start countdown to redirect
+        let countdown = 3;
+        const timerEl = document.getElementById('countdown-timer');
+        if (timerEl) timerEl.textContent = countdown;
+
+        if (redirectInterval) clearInterval(redirectInterval);
+        redirectInterval = setInterval(() => {
+          countdown--;
+          if (timerEl) timerEl.textContent = countdown;
+          if (countdown <= 0) {
+            clearInterval(redirectInterval);
+            window.location.href = WA_GROUP_URL;
+          }
+        }, 1000);
+
+      } catch (err) {
+        console.error(err);
+        alert('Terjadi kesalahan jaringan saat mengirim pendaftaran.');
+      } finally {
+        submitBtn.disabled = false;
+        submitIcon.classList.remove('hidden');
+        submitLoader.classList.add('hidden');
+      }
+    });
+
+    // -------------------------------------------------------------------------
+    // E. MODAL UTILITIES
+    // -------------------------------------------------------------------------
+    function openSuccessModal() {
+      const modal = document.getElementById('success-modal');
+      const modalBox = modal.querySelector('div');
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modal.classList.add('opacity-100');
+        modalBox.classList.remove('scale-90');
+        modalBox.classList.add('scale-100');
+      }, 50);
+    }
+
+    // -------------------------------------------------------------------------
+    // F. SECURITY & PIN
+    // -------------------------------------------------------------------------
+    let isEyeVisible = false;
+
+    function togglePinVisibility() {
+      const pinInput = document.getElementById('input-pin');
+      const eyeIcon = document.getElementById('pin-eye-icon');
+
+      isEyeVisible = !isEyeVisible;
+      if (isEyeVisible) {
+        pinInput.type = 'text';
+        eyeIcon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        pinInput.type = 'password';
+        eyeIcon.setAttribute('data-lucide', 'eye');
+      }
+      safeCreateIcons();
+    }
+
+    function verifyPin() {
+      const pin = document.getElementById('input-pin').value;
+      const errorMsg = document.getElementById('pin-error-msg');
+      const pinContainer = document.getElementById('dashboard-auth');
+      const correctPin = 'RohisKeren2026';
+
+      if (pin === correctPin) {
+        errorMsg.classList.add('hidden');
+        pinContainer.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          pinContainer.classList.add('hidden');
+          document.getElementById('dashboard-content').classList.remove('hidden');
+          refreshDashboardData();
+        }, 300);
+      } else {
+        errorMsg.classList.remove('hidden');
+        pinContainer.classList.remove('animate-shake');
+        void pinContainer.offsetWidth; // Force Reflow
+        pinContainer.classList.add('animate-shake');
+      }
+    }
+
+    // G. STATS FETCH
+    async function refreshDashboardData() {
+      const icon = document.getElementById('btn-refresh-icon');
+      const leaderboard = document.getElementById('leaderboard-container');
+
+      icon.classList.add('animate-spin');
+
+      leaderboard.innerHTML = `
+        <div class="text-center py-8 text-rohis-textMuted text-xs">
+          <i data-lucide="loader" class="w-5 h-5 animate-spin mx-auto mb-2 text-emerald-600"></i>
+          Memperbarui data leaderboard...
+        </div>
+      `;
+
+      // Safe create icon inside try/catch wrapper
+      safeCreateIcons();
+
+      try {
+        const response = await fetch(`${GAS_URL}?action=summary`);
+        if (!response.ok) throw new Error('Fetch failed');
+        const data = await response.json();
+
+        cachedSummaryData = data;
+
+        let totalPendaftar = 0;
+        let activeKakaKelas = data.length;
+        let topKakaKelasName = '-';
+        let topKakaKelasCount = 0;
+
+        data.forEach(item => {
+          totalPendaftar += item.count;
+          if (item.count > topKakaKelasCount) {
+            topKakaKelasCount = item.count;
+            topKakaKelasName = item.kaka_kelas;
+          }
+        });
+
+        document.getElementById('stat-total-pendaftar').textContent = totalPendaftar;
+        document.getElementById('stat-total-mentor').textContent = activeKakaKelas;
+        document.getElementById('stat-top-mentor').textContent = topKakaKelasName !== '-' ? `${topKakaKelasName} (${topKakaKelasCount})` : '-';
+
+        leaderboard.innerHTML = '';
+        if (data && data.length > 0) {
+          data.forEach((row, index) => {
+            const percentage = Math.min((row.count / (topKakaKelasCount || 1)) * 100, 100);
+
+            let rankClass = 'bg-slate-100 text-slate-600 border border-slate-200';
+            let rankNumber = index + 1;
+
+            if (index === 0) {
+              rankClass = 'bg-amber-100 text-amber-800 border border-amber-200 font-bold';
+              rankNumber = '🥇';
+            } else if (index === 1) {
+              rankClass = 'bg-slate-150 text-slate-700 border border-slate-300';
+              rankNumber = '🥈';
+            } else if (index === 2) {
+              rankClass = 'bg-orange-50 text-orange-800 border border-orange-200';
+              rankNumber = '🥉';
+            }
+
+            const itemCard = document.createElement('div');
+            itemCard.className = `border border-slate-100 bg-slate-50/30 rounded-xl p-3.5 flex items-center gap-3.5 transition-all duration-300 hover:bg-slate-50/70`;
+            itemCard.innerHTML = `
+              <span class="text-xs w-6 h-6 rounded-full flex items-center justify-center ${rankClass}">${rankNumber}</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-center mb-1">
+                  <h5 class="text-xs font-bold text-slate-700 truncate pr-2">${row.kaka_kelas}</h5>
+                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                    ${row.count} Siswa
+                  </span>
+                </div>
+                <!-- Mini Cheerful Progress Bar -->
+                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000 ease-out" style="width: 0%;" data-target-width="${percentage}%"></div>
+                </div>
+              </div>
+            `;
+            leaderboard.appendChild(itemCard);
+          });
+
+          // Animation delay for bars
+          setTimeout(() => {
+            leaderboard.querySelectorAll('[data-target-width]').forEach(bar => {
+              bar.style.width = bar.getAttribute('data-target-width');
+            });
+          }, 100);
+        } else {
+          leaderboard.innerHTML = `
+            <div class="text-center py-10 text-rohis-textMuted text-xs">
+              <i data-lucide="folder-open" class="w-6 h-6 mx-auto mb-2 text-slate-300"></i>
+              Belum ada Siswa pendaftar.
+            </div>
+          `;
+          safeCreateIcons();
+        }
+
+      } catch (err) {
+        console.error(err);
+        leaderboard.innerHTML = `
+          <div class="text-center py-8 text-red-600 text-xs">
+            <i data-lucide="alert-triangle" class="w-5 h-5 mx-auto mb-2"></i>
+            Gagal menyinkronkan data leaderboard.
+          </div>
+        `;
+        safeCreateIcons();
+      } finally {
+        icon.classList.remove('animate-spin');
+      }
+    }
+
+    // Close Success Modal
+    function closeSuccessModal() {
+      if (redirectInterval) clearInterval(redirectInterval);
+      const modal = document.getElementById('success-modal');
+      const modalBox = modal.querySelector('div');
+
+      modal.classList.remove('opacity-100');
+      modal.classList.add('opacity-0');
+      modalBox.classList.remove('scale-100');
+      modalBox.classList.add('scale-90');
+
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+  </script>
+</body>
+
+</html>
