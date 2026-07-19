@@ -53,6 +53,9 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <!-- Font (Plus Jakarta Sans - very warm, premium, clean) -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
@@ -85,14 +88,6 @@
 <body
   class="bg-gradient-to-b from-[#f0f9f4] via-[#f7fcf9] to-[#ffffff] text-rohis-textMain min-h-screen relative overflow-x-hidden select-none">
 
-  <!-- ====================== BACKGROUND MUSIC ====================== -->
-  <audio id="bg-music" src="nasyid.mp3" loop></audio>
-
-  <!-- ====================== MUSIC CONTROL BUTTON ====================== -->
-  <button id="music-toggle" class="fixed bottom-4 left-4 z-40 w-9 h-9 rounded-full bg-white/95 border border-slate-200 shadow-md flex items-center justify-center text-emerald-600 hover:text-emerald-700 transition-all duration-300 transform hover:scale-105 active:scale-[0.95]" title="Nyalakan/Matikan Musik">
-    <i data-lucide="volume-x" class="w-4 h-4" id="music-icon"></i>
-  </button>
-
   <!-- ====================== LIGHT BACKGROUND DECORATIONS ====================== -->
   <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
     <!-- Subtle leaves/floral graphic placeholder patterns (drawn in CSS for hand-crafted look) -->
@@ -103,8 +98,16 @@
 
   <!-- ====================== 1️⃣ INTRO / SPLASH SCREEN ====================== -->
   <div id="splash-screen"
-    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#f8fdfb] transition-all duration-700">
-    <div class="relative flex flex-col items-center max-w-sm px-6 text-center">
+    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#f8fdfb] transition-all duration-700 overflow-hidden">
+
+    <!-- Glowing background blobs for splash screen -->
+    <div class="absolute top-1/4 -left-10 w-36 h-36 rounded-full bg-emerald-100/50 blur-3xl animate-float-leaf"></div>
+    <div class="absolute bottom-1/4 -right-10 w-40 h-40 rounded-full bg-emerald-200/40 blur-3xl animate-float-leaf"
+      style="animation-delay: -3s;"></div>
+    <div class="absolute top-10 right-10 w-24 h-24 rounded-full bg-teal-100/40 blur-2xl animate-float-leaf"
+      style="animation-delay: -5s;"></div>
+
+    <div class="relative flex flex-col items-center max-w-sm px-6 text-center z-10">
 
       <!-- Minimalist Hand-crafted Logo Ring -->
       <div class="relative w-36 h-36 mb-6 flex items-center justify-center animate-pulse-soft">
@@ -249,20 +252,26 @@
             </div>
 
             <!-- Kaka Kelas Pengundang -->
-            <div class="space-y-1">
+            <div class="space-y-1 relative" id="kaka-kelas-wrapper">
               <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider ml-1">Invited by (Nama
                 Kaka Kelas)</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <i data-lucide="user-check" class="w-4 h-4"></i>
                 </div>
-                <input id="select-mentor" list="kaka-kelas-list" required placeholder="Memuat daftar Kaka Kelas..."
+                <input id="select-mentor" autocomplete="off" required placeholder="Memuat daftar Kaka Kelas..."
                   class="w-full bg-slate-50/50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300">
-                <datalist id="kaka-kelas-list"></datalist>
                 <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
                   <i data-lucide="search" class="w-4 h-4"></i>
                 </div>
               </div>
+
+              <!-- Custom Searchable Dropdown List -->
+              <div id="custom-dropdown"
+                class="absolute left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden custom-scrollbar">
+                <!-- Dropdown items will be populated dynamically -->
+              </div>
+
               <p id="kaka-kelas-tip" class="text-[10px] text-emerald-600 font-semibold mt-1 hidden">
                 ℹ️ Nama tidak terdaftar? Tetap lanjutkan menulis nama teman/kaka kelas pengundang Anda.
               </p>
@@ -436,7 +445,7 @@
     // -------------------------------------------------------------------------
     // CONFIGURATION – replace with your deployed Apps Script URL
     // -------------------------------------------------------------------------
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbycMbPQNfugPaPJbHnlH__nzKoLPpknrlozNiGZ_WYvuosNu_sGmzuSKARC34bwGbc/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycby2tyuJzX9KlHvUozgiUJcbHc-VI4_o-t4OYxrictSl_fUTJiJMSssdBOGYhUDu9a0M/exec';
 
     // LINK GRUP WHATSAPP - Silakan ganti link grup WA Anda di sini
     const WA_GROUP_URL = 'https://chat.whatsapp.com/LJsJanUTOhrJnJOiKTVo4Q?s=sw&p=a&ilr=1';
@@ -477,22 +486,53 @@
 
       loadMentorDropdown();
 
-      // Autocomplete search helper tip listener
+      // Custom Searchable Dropdown list logic
       const inputMentor = document.getElementById('select-mentor');
+      const dropdownMentor = document.getElementById('custom-dropdown');
       const tipMentor = document.getElementById('kaka-kelas-tip');
-      if (inputMentor && tipMentor) {
+
+      if (inputMentor && dropdownMentor && tipMentor) {
+        // Show suggestions on focus
+        inputMentor.addEventListener('focus', () => {
+          const value = inputMentor.value.trim().toLowerCase();
+          const filtered = kakaKelasList.filter(name => name.toLowerCase().includes(value));
+          populateDropdown(filtered);
+          if (filtered.length > 0) {
+            dropdownMentor.classList.remove('hidden');
+          }
+        });
+
+        // Filter suggestions on typing
         inputMentor.addEventListener('input', () => {
           const value = inputMentor.value.trim();
+          const valueLower = value.toLowerCase();
+
+          const filtered = kakaKelasList.filter(name => name.toLowerCase().includes(valueLower));
+          populateDropdown(filtered);
+
+          if (filtered.length > 0) {
+            dropdownMentor.classList.remove('hidden');
+          } else {
+            dropdownMentor.classList.add('hidden');
+          }
+
+          // Toggle tip
           if (value === '') {
             tipMentor.classList.add('hidden');
             return;
           }
-          const options = Array.from(document.getElementById('kaka-kelas-list').options).map(opt => opt.value);
-          const isFound = options.includes(value);
+          const isFound = kakaKelasList.some(name => name.toLowerCase() === valueLower);
           if (!isFound) {
             tipMentor.classList.remove('hidden');
           } else {
             tipMentor.classList.add('hidden');
+          }
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!inputMentor.contains(e.target) && !dropdownMentor.contains(e.target)) {
+            dropdownMentor.classList.add('hidden');
           }
         });
       }
@@ -511,59 +551,7 @@
       setTimeout(() => {
         splash.style.display = 'none';
       }, 700);
-
-      // Play background nasyid music on enter
-      const bgMusic = document.getElementById('bg-music');
-      const musicIcon = document.getElementById('music-icon');
-      if (bgMusic) {
-        bgMusic.play()
-          .then(() => {
-            isMusicPlaying = true;
-            if (musicIcon) {
-              musicIcon.setAttribute('data-lucide', 'volume-2');
-              safeCreateIcons();
-            }
-          })
-          .catch(e => {
-            console.log("Autoplay blocked, waiting for user toggle:", e);
-          });
-      }
     }
-
-    // Toggle Background Music Playback
-    let isMusicPlaying = false;
-    function toggleMusic() {
-      const bgMusic = document.getElementById('bg-music');
-      const musicIcon = document.getElementById('music-icon');
-      if (!bgMusic) return;
-
-      if (bgMusic.paused) {
-        bgMusic.play()
-          .then(() => {
-            isMusicPlaying = true;
-            if (musicIcon) {
-              musicIcon.setAttribute('data-lucide', 'volume-2');
-              safeCreateIcons();
-            }
-          })
-          .catch(err => console.log("Play failed:", err));
-      } else {
-        bgMusic.pause();
-        isMusicPlaying = false;
-        if (musicIcon) {
-          musicIcon.setAttribute('data-lucide', 'volume-x');
-          safeCreateIcons();
-        }
-      }
-    }
-
-    // Attach listener to music toggle button
-    window.addEventListener('DOMContentLoaded', () => {
-      const musicToggle = document.getElementById('music-toggle');
-      if (musicToggle) {
-        musicToggle.addEventListener('click', toggleMusic);
-      }
-    });
 
     // -------------------------------------------------------------------------
     // B. NAVIGATION / SWITCH TAB
@@ -619,22 +607,19 @@
     // -------------------------------------------------------------------------
     // C. DATABASE API FETCHING
     // -------------------------------------------------------------------------
+    let kakaKelasList = [];
+
     async function loadMentorDropdown() {
-      const datalist = document.getElementById('kaka-kelas-list');
       const input = document.getElementById('select-mentor');
       try {
         const response = await fetch(`${GAS_URL}?action=kaka_kelas`);
         if (!response.ok) throw new Error('Failed to load Kaka Kelas');
         const data = await response.json();
 
-        datalist.innerHTML = '';
         if (data.kaka_kelas && data.kaka_kelas.length > 0) {
-          data.kaka_kelas.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            datalist.appendChild(opt);
-          });
+          kakaKelasList = data.kaka_kelas;
           input.placeholder = "Ketik atau pilih Kaka Kelas...";
+          populateDropdown(kakaKelasList);
         } else {
           input.placeholder = "Daftar Kaka Kelas kosong";
         }
@@ -642,6 +627,29 @@
         console.error(error);
         input.placeholder = "Gagal memuat Kaka Kelas. Segarkan halaman.";
       }
+    }
+
+    function populateDropdown(items) {
+      const dropdown = document.getElementById('custom-dropdown');
+      const tipMentor = document.getElementById('kaka-kelas-tip');
+      dropdown.innerHTML = '';
+
+      if (items.length === 0) {
+        dropdown.classList.add('hidden');
+        return;
+      }
+
+      items.forEach(name => {
+        const div = document.createElement('div');
+        div.className = "px-4 py-2.5 text-xs text-slate-700 hover:bg-[#e6f4ea] hover:text-[#137333] cursor-pointer transition-colors duration-200 text-left";
+        div.textContent = name;
+        div.addEventListener('click', () => {
+          document.getElementById('select-mentor').value = name;
+          dropdown.classList.add('hidden');
+          if (tipMentor) tipMentor.classList.add('hidden');
+        });
+        dropdown.appendChild(div);
+      });
     }
 
     // D. FORM REGISTRATION SUBMISSION
@@ -739,6 +747,38 @@
         modalBox.classList.remove('scale-90');
         modalBox.classList.add('scale-100');
       }, 50);
+
+      // Trigger colorful success confetti!
+      triggerConfetti();
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#059669', '#10b981', '#34d399', '#f59e0b', '#fbbf24', '#60a5fa']
+        });
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: ['#059669', '#10b981', '#f59e0b']
+          });
+        }, 200);
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: ['#059669', '#10b981', '#f59e0b']
+          });
+        }, 400);
+      }
     }
 
     // -------------------------------------------------------------------------
@@ -844,24 +884,61 @@
             }
 
             const itemCard = document.createElement('div');
-            itemCard.className = `border border-slate-100 bg-slate-50/30 rounded-xl p-3.5 flex items-center gap-3.5 transition-all duration-300 hover:bg-slate-50/70`;
+            itemCard.className = `border border-slate-100 bg-slate-50/30 rounded-xl p-3.5 flex flex-col gap-2 transition-all duration-300 hover:bg-slate-50/70 cursor-pointer`;
             itemCard.innerHTML = `
-              <span class="text-xs w-6 h-6 rounded-full flex items-center justify-center ${rankClass}">${rankNumber}</span>
-              <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-center mb-1">
-                  <h5 class="text-xs font-bold text-slate-700 truncate pr-2">${row.kaka_kelas}</h5>
-                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                    ${row.count} Siswa
-                  </span>
+              <div class="flex items-center gap-3.5">
+                <span class="text-xs w-6 h-6 rounded-full flex items-center justify-center ${rankClass}">${rankNumber}</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex justify-between items-center mb-1">
+                    <h5 class="text-xs font-bold text-slate-700 truncate pr-2">${row.kaka_kelas}</h5>
+                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                      ${row.count} Siswa
+                    </span>
+                  </div>
+                  <!-- Mini Cheerful Progress Bar -->
+                  <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000 ease-out" style="width: 0%;" data-target-width="${percentage}%"></div>
+                  </div>
                 </div>
-                <!-- Mini Cheerful Progress Bar -->
-                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000 ease-out" style="width: 0%;" data-target-width="${percentage}%"></div>
+                <!-- Dropdown Arrow -->
+                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 transition-transform duration-300" id="chevron-${index}"></i>
+              </div>
+              
+              <!-- Expandable Student List -->
+              <div id="details-${index}" class="hidden pl-9 mt-1 pt-2.5 border-t border-slate-100/80">
+                <p class="text-[9px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Siswa yang diundang:</p>
+                <div class="space-y-1.5">
+                  ${row.siswa_list && row.siswa_list.length > 0 ? row.siswa_list.map(siswa => `
+                    <div class="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-slate-100 text-[11px] shadow-sm">
+                      <span class="font-bold text-slate-700">${siswa.nama}</span>
+                      <span class="text-[10px] text-slate-500 bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded font-semibold">${siswa.kelas}</span>
+                    </div>
+                  `).join('') : '<p class="text-[11px] text-slate-400 italic">Belum ada siswa.</p>'}
                 </div>
               </div>
             `;
+
+            // Toggle event
+            itemCard.addEventListener('click', (e) => {
+              const details = document.getElementById(`details-${index}`);
+              const chevron = document.getElementById(`chevron-${index}`);
+              if (details && chevron) {
+                const isHidden = details.classList.contains('hidden');
+                if (isHidden) {
+                  details.classList.remove('hidden');
+                  chevron.classList.add('rotate-90');
+                } else {
+                  details.classList.add('hidden');
+                  chevron.classList.remove('rotate-90');
+                }
+              }
+            });
+
             leaderboard.appendChild(itemCard);
           });
+
+          // Re-render Lucide icons for chevrons
+          safeCreateIcons();
 
           // Animation delay for bars
           setTimeout(() => {

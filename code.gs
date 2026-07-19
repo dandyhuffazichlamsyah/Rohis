@@ -75,14 +75,22 @@ function getKakaKelas() {
  * ----------------------------------------------------------------- */
 function getKakaKelasSummary() {
   const sheet = getSheet('Pendaftar');
-  const data = sheet.getRange('D2:D' + sheet.getLastRow()).getValues(); // Kaka Kelas column
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return [];
+  const data = sheet.getRange(2, 1, lastRow - 1, 4).getValues(); // Nama, Kelas, WA, Kaka Kelas
   const map = {};
   data.forEach(row => {
-    const name = row[0];
+    const nama = row[0];
+    const kelas = row[1];
+    const name = row[3];
     if (!name) return;
-    map[name] = (map[name] || 0) + 1;
+    if (!map[name]) {
+      map[name] = { kaka_kelas: name, count: 0, siswa_list: [] };
+    }
+    map[name].count++;
+    map[name].siswa_list.push({ nama: nama, kelas: kelas });
   });
-  const result = Object.keys(map).map(k => ({ kaka_kelas: k, count: map[k] }));
+  const result = Object.keys(map).map(k => map[k]);
   result.sort((a, b) => b.count - a.count);
   return result;
 }
