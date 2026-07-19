@@ -36,7 +36,7 @@ function doGet(e) {
 
   // Serve the index.html file as the web app homepage
   return HtmlService.createHtmlOutputFromFile('index')
-                    .setTitle('Pendaftaran & Dashboard Rohis SMAN 27')
+                    .setTitle('Pendaftaran (Welcome To Rohis 27)')
                     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
                     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
