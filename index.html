@@ -85,6 +85,14 @@
 <body
   class="bg-gradient-to-b from-[#f0f9f4] via-[#f7fcf9] to-[#ffffff] text-rohis-textMain min-h-screen relative overflow-x-hidden select-none">
 
+  <!-- ====================== BACKGROUND MUSIC ====================== -->
+  <audio id="bg-music" src="nasyid.mp3" loop></audio>
+
+  <!-- ====================== MUSIC CONTROL BUTTON ====================== -->
+  <button id="music-toggle" class="fixed bottom-4 left-4 z-40 w-9 h-9 rounded-full bg-white/95 border border-slate-200 shadow-md flex items-center justify-center text-emerald-600 hover:text-emerald-700 transition-all duration-300 transform hover:scale-105 active:scale-[0.95]" title="Nyalakan/Matikan Musik">
+    <i data-lucide="volume-x" class="w-4 h-4" id="music-icon"></i>
+  </button>
+
   <!-- ====================== LIGHT BACKGROUND DECORATIONS ====================== -->
   <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
     <!-- Subtle leaves/floral graphic placeholder patterns (drawn in CSS for hand-crafted look) -->
@@ -503,7 +511,59 @@
       setTimeout(() => {
         splash.style.display = 'none';
       }, 700);
+
+      // Play background nasyid music on enter
+      const bgMusic = document.getElementById('bg-music');
+      const musicIcon = document.getElementById('music-icon');
+      if (bgMusic) {
+        bgMusic.play()
+          .then(() => {
+            isMusicPlaying = true;
+            if (musicIcon) {
+              musicIcon.setAttribute('data-lucide', 'volume-2');
+              safeCreateIcons();
+            }
+          })
+          .catch(e => {
+            console.log("Autoplay blocked, waiting for user toggle:", e);
+          });
+      }
     }
+
+    // Toggle Background Music Playback
+    let isMusicPlaying = false;
+    function toggleMusic() {
+      const bgMusic = document.getElementById('bg-music');
+      const musicIcon = document.getElementById('music-icon');
+      if (!bgMusic) return;
+
+      if (bgMusic.paused) {
+        bgMusic.play()
+          .then(() => {
+            isMusicPlaying = true;
+            if (musicIcon) {
+              musicIcon.setAttribute('data-lucide', 'volume-2');
+              safeCreateIcons();
+            }
+          })
+          .catch(err => console.log("Play failed:", err));
+      } else {
+        bgMusic.pause();
+        isMusicPlaying = false;
+        if (musicIcon) {
+          musicIcon.setAttribute('data-lucide', 'volume-x');
+          safeCreateIcons();
+        }
+      }
+    }
+
+    // Attach listener to music toggle button
+    window.addEventListener('DOMContentLoaded', () => {
+      const musicToggle = document.getElementById('music-toggle');
+      if (musicToggle) {
+        musicToggle.addEventListener('click', toggleMusic);
+      }
+    });
 
     // -------------------------------------------------------------------------
     // B. NAVIGATION / SWITCH TAB
