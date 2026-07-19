@@ -29,6 +29,7 @@
             'pulse-soft': 'pulseSoft 2.5s ease-in-out infinite',
             'float-leaf': 'floatLeaf 8s ease-in-out infinite alternate',
             'shake': 'shake 0.4s ease-in-out',
+            'float-star': 'floatStar 6s ease-in-out infinite',
           },
           keyframes: {
             pulseSoft: {
@@ -43,6 +44,10 @@
               '0%, 100%': { transform: 'translateX(0)' },
               '20%, 60%': { transform: 'translateX(-4px)' },
               '40%, 80%': { transform: 'translateX(4px)' },
+            },
+            floatStar: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)', opacity: '0.15' },
+              '50%': { transform: 'translateY(-20px) rotate(90deg)', opacity: '0.5' },
             }
           }
         }
@@ -99,20 +104,32 @@
   <!-- ====================== 1️⃣ INTRO / SPLASH SCREEN ====================== -->
   <div id="splash-screen"
     class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#f8fdfb] transition-all duration-700 overflow-hidden">
-
+    
     <!-- Glowing background blobs for splash screen -->
     <div class="absolute top-1/4 -left-10 w-36 h-36 rounded-full bg-emerald-100/50 blur-3xl animate-float-leaf"></div>
-    <div class="absolute bottom-1/4 -right-10 w-40 h-40 rounded-full bg-emerald-200/40 blur-3xl animate-float-leaf"
-      style="animation-delay: -3s;"></div>
-    <div class="absolute top-10 right-10 w-24 h-24 rounded-full bg-teal-100/40 blur-2xl animate-float-leaf"
-      style="animation-delay: -5s;"></div>
+    <div class="absolute bottom-1/4 -right-10 w-40 h-40 rounded-full bg-emerald-200/40 blur-3xl animate-float-leaf" style="animation-delay: -3s;"></div>
+    <div class="absolute top-10 right-10 w-24 h-24 rounded-full bg-teal-100/40 blur-2xl animate-float-leaf" style="animation-delay: -5s;"></div>
+
+    <!-- Glowing Islamic Star Sprinkles in Splash -->
+    <svg viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-emerald-600/25 absolute top-10 left-12 animate-float-star pointer-events-none">
+      <path d="M12 1.5l2.76 3.82 4.67-.82-.82 4.67 3.82 2.76-3.82 2.76.82 4.67-4.67-.82L12 22.5l-2.76-3.82-4.67.82.82-4.67-3.82-2.76 3.82-2.76-.82-4.67 4.67.82zM12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z"/>
+    </svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-teal-600/20 absolute bottom-16 left-24 animate-float-star pointer-events-none" style="animation-delay: -2s;">
+      <path d="M12 1.5l2.76 3.82 4.67-.82-.82 4.67 3.82 2.76-3.82 2.76.82 4.67-4.67-.82L12 22.5l-2.76-3.82-4.67.82.82-4.67-3.82-2.76 3.82-2.76-.82-4.67 4.67.82zM12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z"/>
+    </svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-emerald-500/20 absolute top-24 right-20 animate-float-star pointer-events-none" style="animation-delay: -4s;">
+      <path d="M12 1.5l2.76 3.82 4.67-.82-.82 4.67 3.82 2.76-3.82 2.76.82 4.67-4.67-.82L12 22.5l-2.76-3.82-4.67.82.82-4.67-3.82-2.76 3.82-2.76-.82-4.67 4.67.82zM12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z"/>
+    </svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-emerald-600/15 absolute bottom-32 right-12 animate-float-star pointer-events-none" style="animation-delay: -1s;">
+      <path d="M12 1.5l2.76 3.82 4.67-.82-.82 4.67 3.82 2.76-3.82 2.76.82 4.67-4.67-.82L12 22.5l-2.76-3.82-4.67.82.82-4.67-3.82-2.76 3.82-2.76-.82-4.67 4.67.82zM12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z"/>
+    </svg>
 
     <div class="relative flex flex-col items-center max-w-sm px-6 text-center z-10">
 
       <!-- Minimalist Hand-crafted Logo Ring -->
       <div class="relative w-36 h-36 mb-6 flex items-center justify-center animate-pulse-soft">
-        <!-- Delicate rotating dotted ring -->
-        <div class="absolute inset-0 rounded-full border border-dashed border-emerald-500/30 animate-spin-slow"></div>
+        <!-- Delicate static dotted ring -->
+        <div class="absolute inset-0 rounded-full border border-dashed border-emerald-500/30"></div>
         <div class="absolute inset-2.5 rounded-full border border-emerald-500/10"></div>
 
         <!-- Logo Image Container -->
@@ -224,7 +241,7 @@
               </div>
             </div>
 
-            <!-- Kelas / Jurusan -->
+            <!-- Kelas -->
             <div class="space-y-1">
               <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider ml-1">Kelas</label>
               <div class="relative group">
@@ -232,8 +249,40 @@
                   class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-600 transition-colors">
                   <i data-lucide="graduation-cap" class="w-4 h-4"></i>
                 </div>
-                <input type="text" id="input-kelas" required placeholder="Contoh: X-1"
-                  class="w-full bg-slate-50/50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300">
+                <select id="input-kelas" required
+                  class="w-full bg-slate-50/50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-800 appearance-none focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300 cursor-pointer">
+                  <option value="" class="bg-white">-- Pilih Kelas Anda --</option>
+                  <optgroup label="Kelas X" class="bg-white font-semibold">
+                    <option value="X-1" class="bg-white">X-1</option>
+                    <option value="X-2" class="bg-white">X-2</option>
+                    <option value="X-3" class="bg-white">X-3</option>
+                    <option value="X-4" class="bg-white">X-4</option>
+                    <option value="X-5" class="bg-white">X-5</option>
+                    <option value="X-6" class="bg-white">X-6</option>
+                    <option value="X-7" class="bg-white">X-7</option>
+                  </optgroup>
+                  <optgroup label="Kelas XI" class="bg-white font-semibold">
+                    <option value="XI-1" class="bg-white">XI-1</option>
+                    <option value="XI-2" class="bg-white">XI-2</option>
+                    <option value="XI-3" class="bg-white">XI-3</option>
+                    <option value="XI-4" class="bg-white">XI-4</option>
+                    <option value="XI-5" class="bg-white">XI-5</option>
+                    <option value="XI-6" class="bg-white">XI-6</option>
+                    <option value="XI-7" class="bg-white">XI-7</option>
+                  </optgroup>
+                  <optgroup label="Kelas XII" class="bg-white font-semibold">
+                    <option value="XII-1" class="bg-white">XII-1</option>
+                    <option value="XII-2" class="bg-white">XII-2</option>
+                    <option value="XII-3" class="bg-white">XII-3</option>
+                    <option value="XII-4" class="bg-white">XII-4</option>
+                    <option value="XII-5" class="bg-white">XII-5</option>
+                    <option value="XII-6" class="bg-white">XII-6</option>
+                    <option value="XII-7" class="bg-white">XII-7</option>
+                  </optgroup>
+                </select>
+                <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                  <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                </div>
               </div>
             </div>
 
