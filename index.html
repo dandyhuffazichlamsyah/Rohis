@@ -907,7 +907,7 @@
         let topKakaKelasCount = 0;
 
         data.forEach(item => {
-          totalPendaftar += item.count;
+          totalPendaftar += (item.siswa_list ? item.siswa_list.length : 0);
           if (item.count > topKakaKelasCount) {
             topKakaKelasCount = item.count;
             topKakaKelasName = item.kaka_kelas;
@@ -916,7 +916,7 @@
 
         document.getElementById('stat-total-pendaftar').textContent = totalPendaftar;
         document.getElementById('stat-total-mentor').textContent = activeKakaKelas;
-        document.getElementById('stat-top-mentor').textContent = topKakaKelasName !== '-' ? `${topKakaKelasName} (${topKakaKelasCount})` : '-';
+        document.getElementById('stat-top-mentor').textContent = topKakaKelasName !== '-' ? `${topKakaKelasName} (${topKakaKelasCount} Poin)` : '-';
 
         leaderboard.innerHTML = '';
         if (data && data.length > 0) {
@@ -946,7 +946,7 @@
                   <div class="flex justify-between items-center mb-1">
                     <h5 class="text-xs font-bold text-slate-700 truncate pr-2">${row.kaka_kelas}</h5>
                     <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                      ${row.count} Siswa
+                      ${row.count} Poin
                     </span>
                   </div>
                   <!-- Mini Cheerful Progress Bar -->
@@ -964,7 +964,10 @@
                 <div class="space-y-1.5">
                   ${row.siswa_list && row.siswa_list.length > 0 ? row.siswa_list.map(siswa => `
                     <div class="flex justify-between items-center bg-white px-3 py-2 rounded-lg border border-slate-100 text-[11px] shadow-sm">
-                      <span class="font-bold text-slate-700">${siswa.nama}</span>
+                      <div class="flex flex-col text-left">
+                        <span class="font-bold text-slate-700">${siswa.nama}</span>
+                        <span class="text-[9px] text-emerald-600 font-semibold mt-0.5">+${siswa.poin} Poin</span>
+                      </div>
                       <span class="text-[10px] text-slate-500 bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded font-semibold">${siswa.kelas}</span>
                     </div>
                   `).join('') : '<p class="text-[11px] text-slate-400 italic">Belum ada siswa.</p>'}
