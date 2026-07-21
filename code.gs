@@ -49,8 +49,12 @@ function doPost(e) {
     if (!payload.nama || !payload.kelas || !payload.wa || !payload.kaka_kelas) {
       throw new Error('Data tidak lengkap');
     }
+    let waFormatted = payload.wa;
+    if (waFormatted && String(waFormatted).startsWith('+')) {
+      waFormatted = "'" + waFormatted; // Force text format to prevent Google Sheets formula parsing error
+    }
     const sheet = getSheet('Pendaftar');
-    sheet.appendRow([payload.nama, payload.kelas, payload.wa, payload.kaka_kelas]);
+    sheet.appendRow([payload.nama, payload.kelas, waFormatted, payload.kaka_kelas]);
     // plain‑text response works with fetch(no‑cors)
     return ContentService.createTextOutput('OK')
                          .setMimeType(ContentService.MimeType.TEXT);
