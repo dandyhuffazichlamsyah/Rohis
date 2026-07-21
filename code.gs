@@ -87,8 +87,28 @@ function getKakaKelasSummary() {
     if (!map[name]) {
       map[name] = { kaka_kelas: name, count: 0, siswa_list: [] };
     }
-    map[name].count++;
-    map[name].siswa_list.push({ nama: nama, kelas: kelas });
+    
+    // Poin logic: Kelas X = 1.0, Kelas XI/XII = 0.5
+    let p = 0.5;
+    const k = (kelas || '').toUpperCase().trim();
+    if (k.startsWith('X-') || k === 'X') {
+      p = 1.0;
+    } else if (k.startsWith('XI-') || k === 'XI') {
+      p = 0.5;
+    } else if (k.startsWith('XII-') || k === 'XII') {
+      p = 0.5;
+    } else {
+      if (k.includes('XI')) {
+        p = 0.5;
+      } else if (k.includes('XII')) {
+        p = 0.5;
+      } else if (k.includes('X')) {
+        p = 1.0;
+      }
+    }
+    
+    map[name].count += p;
+    map[name].siswa_list.push({ nama: nama, kelas: kelas, poin: p });
   });
   const result = Object.keys(map).map(k => map[k]);
   result.sort((a, b) => b.count - a.count);
