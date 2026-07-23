@@ -30,8 +30,12 @@ function doGet(e) {
   }
 
   if (action === 'summary') {
-    return ContentService.createTextOutput(JSON.stringify(getKakaKelasSummary()))
-                         .setMimeType(ContentService.MimeType.JSON);
+    const summaryData = getKakaKelasSummary();
+    const dailyTopData = getDailyTop1Snapshot();
+    return ContentService.createTextOutput(JSON.stringify({
+      summary: summaryData,
+      daily_top: dailyTopData
+    })).setMimeType(ContentService.MimeType.JSON);
   }
 
   // Serve the index.html file as the web app homepage
@@ -117,4 +121,43 @@ function getKakaKelasSummary() {
   const result = Object.keys(map).map(k => map[k]);
   result.sort((a, b) => b.count - a.count);
   return result;
+}
+
+/** -----------------------------------------------------------------
+ *  Helper: get daily top 1 snapshot from ScriptProperties or fallback
+ * ----------------------------------------------------------------- */
+function getDailyTop1Snapshot() {
+  const props = PropertiesService.getScriptProperties();
+  const savedData = props.getProperty('DAILY_TOP_1');
+  if (savedData) {
+    try {
+      return JSON.parse(savedData);
+    } catch(e) {}
+  }
+  // Fallback if trigger has not fired yet: calculate current Top 1
+  const summary = getKakaKelasSummary();
+  if (summary.length > 0) {
+    return {
+      kaka_kelas: summary[0].kaka_kelas,
+      count: summary[0].count,
+      updated_at: 'Jam 20:00 WIB'
+    };
+  }
+  return null;
+}
+
+/** -----------------------------------------------------------------
+ *  Trigger Function: Run this daily at 20:00 WIB using Apps Script Triggers
+ * ----------------------------------------------------------------- */
+function updateDailyTopTrigger() {
+  const summary = getKakaKelasSummary();
+  if (summary.length > 0) {
+    const top1 = {
+      kaka_kelas: summary[0].kaka_kelas,
+      count: summary[0].count,
+      date_str: Utilities.formatDate(new Date(), 'Asia/Jakarta', 'dd MMMM yyyy'),
+      updated_at: '20:00 WIB'
+    };
+    PropertiesService.getScriptProperties().setProperty('DAILY_TOP_1', JSON.stringify(top1));
+  }
 }

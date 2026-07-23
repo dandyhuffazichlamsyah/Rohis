@@ -88,6 +88,19 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: rgba(5, 150, 105, 0.4);
     }
+
+    @keyframes marqueeText {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .animate-marquee-text {
+      display: inline-block;
+      white-space: nowrap;
+      animation: marqueeText 22s linear infinite;
+    }
+    .animate-marquee-text:hover {
+      animation-play-state: paused;
+    }
   </style>
 </head>
 
@@ -185,6 +198,19 @@
   <!-- ====================== MAIN CONTAINER ====================== -->
   <main id="main-content"
     class="min-h-screen flex flex-col opacity-0 scale-[0.98] transition-all duration-700 pointer-events-none">
+
+    <!-- ====================== RUNNING TEXT MARQUEE BANNER ====================== -->
+    <div id="running-banner" class="w-full bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white text-xs py-2 px-4 shadow-md overflow-hidden flex items-center border-b border-emerald-700/50 relative z-30 select-none">
+      <div class="flex items-center gap-1.5 bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider whitespace-nowrap mr-3 border border-amber-400/30 shrink-0 shadow-sm">
+        <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-300"></i>
+        <span>TOP KAKA KELAS</span>
+      </div>
+      <div class="overflow-hidden relative w-full flex items-center">
+        <div id="running-text-content" class="animate-marquee-text font-medium text-[11.5px] text-emerald-50">
+          🏆 Memuat pengumuman Top Kaka Kelas Poin Terbanyak...
+        </div>
+      </div>
+    </div>
 
     <!-- TOP BAR / HEADER -->
     <header class="container mx-auto max-w-4xl px-6 py-6 flex items-center justify-between">
@@ -539,6 +565,9 @@
       }, 130);
 
       loadMentorDropdown();
+
+      // Trigger initial background fetch for running banner content
+      refreshDashboardData();
 
       // Custom Searchable Dropdown list logic
       const inputMentor = document.getElementById('select-mentor');
@@ -898,19 +927,48 @@
       return 0.5;
     }
 
+    function updateRunningBanner(topDaily, summaryList) {
+      const bannerContent = document.getElementById('running-text-content');
+      if (!bannerContent) return;
+
+      let topName = '';
+      let topCount = 0;
+
+      if (topDaily && topDaily.kaka_kelas) {
+        topName = topDaily.kaka_kelas;
+        topCount = topDaily.count;
+      } else if (summaryList && summaryList.length > 0) {
+        topName = summaryList[0].kaka_kelas;
+        topCount = summaryList[0].count;
+      }
+
+      if (topName) {
+        bannerContent.innerHTML = `
+          🏆 <strong class="text-amber-300">UPDATE JAM 20:00 WIB:</strong> Selamat kepada <span class="font-extrabold text-white underline decoration-amber-400 decoration-2 underline-offset-2">${topName}</span> sebagai Top Kaka Kelas dengan perolehan <span class="font-extrabold text-amber-300">${topCount} Poin</span>! 🎉 Terima kasih telah menginspirasi pendaftar baru ROHIS SMAN 27! ✨
+        `;
+      } else {
+        bannerContent.innerHTML = `
+          ✨ Belum ada pendaftar hari ini. Ayo Kaka Kelas, ajak adik-adik bergabung di ROHIS SMAN 27! 🚀
+        `;
+      }
+      safeCreateIcons();
+    }
+
     // G. STATS FETCH
     async function refreshDashboardData() {
       const icon = document.getElementById('btn-refresh-icon');
       const leaderboard = document.getElementById('leaderboard-container');
 
-      icon.classList.add('animate-spin');
+      if (icon) icon.classList.add('animate-spin');
 
-      leaderboard.innerHTML = `
-        <div class="text-center py-8 text-rohis-textMuted text-xs">
-          <i data-lucide="loader" class="w-5 h-5 animate-spin mx-auto mb-2 text-emerald-600"></i>
-          Memperbarui data leaderboard...
-        </div>
-      `;
+      if (leaderboard) {
+        leaderboard.innerHTML = `
+          <div class="text-center py-8 text-rohis-textMuted text-xs">
+            <i data-lucide="loader" class="w-5 h-5 animate-spin mx-auto mb-2 text-emerald-600"></i>
+            Memperbarui data leaderboard...
+          </div>
+        `;
+      }
 
       // Safe create icon inside try/catch wrapper
       safeCreateIcons();
@@ -918,7 +976,10 @@
       try {
         const response = await fetch(`${GAS_URL}?action=summary`);
         if (!response.ok) throw new Error('Fetch failed');
-        const data = await response.json();
+        const rawData = await response.json();
+
+        let data = Array.isArray(rawData) ? rawData : (rawData.summary || []);
+        let dailyTop = Array.isArray(rawData) ? null : (rawData.daily_top || null);
 
         // Process points dynamically for guaranteed display correctness
         if (Array.isArray(data)) {
@@ -934,6 +995,9 @@
           });
           data.sort((a, b) => b.count - a.count);
         }
+
+        // Update top running text banner
+        updateRunningBanner(dailyTop, data);
 
         cachedSummaryData = data;
 
